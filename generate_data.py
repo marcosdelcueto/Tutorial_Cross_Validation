@@ -19,7 +19,6 @@ def generate_data(xmin,xmax,Delta,noise):
             f[i][j] = f[i][j] + random.uniform(-noise,noise)  # add random noise to f(x1,x2)
     return x1,x2,f
 
-x,y,f=generate_data(-10,10,0.1,0)
 # Create {x1,x2,f} dataset every 1.0 from -10 to 10, with a noise of +/- 2
 x1,y1,f1=generate_data(-10,10,1.0,0.2)
 
