@@ -4,18 +4,20 @@ import math
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib import gridspec
 from mpl_toolkits.mplot3d import Axes3D
 from sklearn import preprocessing
 from sklearn.model_selection import KFold
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.metrics import mean_squared_error
+from scipy.stats import pearsonr
 ######################################################################################################
 def main():
     # Create {x1,x2,f} dataset every 1.0 from -10 to 10, with a noise of +/- 2
     x1,x2,f=generate_data(-10,10,1.0,0.2)
     # Prepare X and y for KRR
     X,y = prepare_data_to_KRR(x1,x2,f)
-    hyperparams = (0.0005,1.5171)
+    hyperparams = (0.01,1.5)
     KRR_function(hyperparams,X,y)
 ######################################################################################################
 def generate_data(xmin,xmax,Delta,noise):
@@ -67,9 +69,37 @@ def KRR_function(hyperparams,X,y):
     # Fit KRR with (X_train_scaled, y_train), and predict X_test_scaled
     KRR = KernelRidge(kernel='rbf',alpha=alpha_value,gamma=gamma_value)
     y_pred = KRR.fit(X_train_scaled, y_train).predict(X_test_scaled)
+    #print('y_test')
+    #print(y_test)
+    #print('y_pred')
+    #print(y_pred)
     # Calculate error metric of test and predicted values: rmse
     rmse = np.sqrt(mean_squared_error(y_test, y_pred))
-    print('alpha: %.6f . gamma: %.6f . rmse: %.6f' %(alpha_value,gamma_value,rmse)) # Uncomment to print intermediate results
+    r_pearson, _ = pearsonr(y_test, y_pred)
+    print('alpha: %.2f . gamma: %.2f . rmse: %.4f . r: %.4f' %(alpha_value,gamma_value,rmse,r_pearson)) # Uncomment to print intermediate results
+    plot_scatter(y_test,y_pred)
     return rmse
+######################################################################################################
+def plot_scatter(x,y):
+    x = np.array(x)
+    y = np.array(y)
+    fig = plt.figure()
+    gs = gridspec.GridSpec(1, 1)
+    r, _ = pearsonr(x, y)
+    rmse = np.sqrt(mean_squared_error(x,y))
+    ma = np.max([x.max(), y.max()]) + 0.1
+    mi = np.min([x.min(), y.min()]) - 0.1
+    ax = plt.subplot(gs[0])
+    ax.scatter(x, y, color="C0")
+    #ax.tick_params(axis='both', which='major', direction='in', labelsize=22, pad=10, length=5)
+    ax.set_xlabel(r"Actual $f(x_1,x_2)$", size=14, labelpad=10)
+    ax.set_ylabel(r"Predicted $f(x_1,x_2)$", size=14, labelpad=10)
+    ax.set_xlim(mi, ma)
+    ax.set_ylim(mi, ma)
+    ax.set_aspect('equal')
+    ax.plot(np.arange(mi, ma + 0.1, 0.1), np.arange(mi, ma + 0.1, 0.1), color="k", ls="--")
+    ax.annotate(u'$RMSE$ = %.4f' % rmse, xy=(0.15,0.85), xycoords='axes fraction', size=12)
+    file_name="prediction_validation.png"
+    plt.savefig(file_name,dpi=600,bbox_inches='tight')
 ######################################################################################################
 main()

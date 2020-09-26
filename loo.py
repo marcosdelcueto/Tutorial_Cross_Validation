@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from matplotlib import gridspec
 from mpl_toolkits.mplot3d import Axes3D
 from sklearn import preprocessing
-from sklearn.model_selection import KFold
+from sklearn.model_selection import LeaveOneOut
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.metrics import mean_squared_error
 from scipy.stats import pearsonr
@@ -51,11 +51,11 @@ def KRR_function(hyperparams,X,y):
     # Assign hyper-parameters
     alpha_value,gamma_value = hyperparams
     # Split data into test and train: random state fixed for reproducibility
-    kf = KFold(n_splits=5,shuffle=True,random_state=2020)
+    loo = LeaveOneOut()
     y_pred_total = []
     y_test_total = []
     # kf-fold cross-validation loop
-    for train_index, test_index in kf.split(X):
+    for train_index, test_index in loo.split(X):
         #print('NEW FOLD')
         #print('train_index:', train_index)
         #print('test_index:', test_index)
@@ -110,7 +110,7 @@ def plot_scatter(x,y):
     ax.set_aspect('equal')
     ax.plot(np.arange(mi, ma + 0.1, 0.1), np.arange(mi, ma + 0.1, 0.1), color="k", ls="--")
     ax.annotate(u'$RMSE$ = %.4f' % rmse, xy=(0.15,0.85), xycoords='axes fraction', size=12)
-    file_name="prediction_kfold.png"
+    file_name="prediction_loo.png"
     plt.savefig(file_name,dpi=600,bbox_inches='tight')
 ######################################################################################################
 main()
