@@ -1,9 +1,13 @@
 # Tutorial Cross Validation
-This repository contains the code, data and images used in the blog article at https://www.mdelcueto.com/blog/
+This repository contains the code, data and images used in the blog post at https://www.mdelcueto.com/blog/a-brief-guide-to-cross-validation
 
 ---
 ## Contents
-
+- **generate_data.py**: it generates and plots x<sub>1</sub>,x<sub>2</sub>,f(x<sub>1</sub>,x<sub>2</sub>) data
+- **validation.py**: uses regular validation to calculate RMSE and r of KRR model of dataset
+- **kfold.py**: uses k-fold cross-validation to calculate RMSE and r of KRR model of dataset
+- **loo.py**: uses leave-one-out cross-validation to calculate RMSE and r of KRR model of dataset
+- **figures**: folder with all figures used in article
 
 ---
 
