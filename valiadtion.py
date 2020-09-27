@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Marcos del Cueto
-import math
+#import math
 import random
 import numpy as np
 import matplotlib.pyplot as plt
@@ -13,10 +13,10 @@ from sklearn.metrics import mean_squared_error
 from scipy.stats import pearsonr
 ######################################################################################################
 def main():
-    # Create {x1,x2,f} dataset every 1.0 from -10 to 10, with a noise of +/- 2
+    # Create {x1,x2,f} dataset every 1.0 from -10 to 10, with a noise of +/- 0.2
     x1,x2,f=generate_data(-10,10,1.0,0.2)
-    # Prepare X and y for KRR
-    X,y = prepare_data_to_KRR(x1,x2,f)
+    # Prepare X and y for ML
+    X,y = prepare_data_for_ML(x1,x2,f)
     hyperparams = (0.01,1.5)
     KRR_function(hyperparams,X,y)
 ######################################################################################################
@@ -33,7 +33,7 @@ def generate_data(xmin,xmax,Delta,noise):
             f[i][j] = f[i][j] + random.uniform(-noise,noise)  # add random noise to f(x1,x2)
     return x1,x2,f
 ######################################################################################################
-def prepare_data_to_KRR(x1,x2,f):
+def prepare_data_for_ML(x1,x2,f):
     X = []
     for i in range(len(f)):
         for j in range(len(f)):
@@ -50,16 +50,9 @@ def KRR_function(hyperparams,X,y):
     # Assign hyper-parameters
     alpha_value,gamma_value = hyperparams
     # Split data into test and train: random state fixed for reproducibility
-    y_pred_total = []
-    y_test_total = []
-    #test_index = random.SystemRandom(2020).choices(range(len(y)), k=40)
     random.seed(a=2020)
     test_index = random.choices(range(len(y)), k=40)
-    test_index = sorted(test_index)
     train_index = np.setdiff1d(range(len(y)),test_index)
-    train_index = sorted(train_index)
-    #print('train_index:', train_index)
-    #print('test_index:', test_index)
     X_train, X_test = X[train_index], X[test_index]
     y_train, y_test = y[train_index], y[test_index]
     # Scale X_train and X_test
@@ -69,14 +62,10 @@ def KRR_function(hyperparams,X,y):
     # Fit KRR with (X_train_scaled, y_train), and predict X_test_scaled
     KRR = KernelRidge(kernel='rbf',alpha=alpha_value,gamma=gamma_value)
     y_pred = KRR.fit(X_train_scaled, y_train).predict(X_test_scaled)
-    #print('y_test')
-    #print(y_test)
-    #print('y_pred')
-    #print(y_pred)
     # Calculate error metric of test and predicted values: rmse
     rmse = np.sqrt(mean_squared_error(y_test, y_pred))
     r_pearson, _ = pearsonr(y_test, y_pred)
-    print('alpha: %.2f . gamma: %.2f . rmse: %.4f . r: %.4f' %(alpha_value,gamma_value,rmse,r_pearson)) # Uncomment to print intermediate results
+    print('KRR validation . RMSE: %.4f . r: %.4f' %(rmse,r_pearson))
     plot_scatter(y_test,y_pred)
     return rmse
 ######################################################################################################

@@ -19,7 +19,7 @@ def main():
     # Prepare X and y for KRR
     X,y = prepare_data_to_KRR(x1,x2,f)
     hyperparams = (0.01,1.5)
-    KRR_function(hyperparams,X,y)
+    KRR_function_LOO(hyperparams,X,y)
 ######################################################################################################
 def generate_data(xmin,xmax,Delta,noise):
     # Calculate f=sin(x1)+cos(x2)
@@ -47,22 +47,18 @@ def prepare_data_to_KRR(x1,x2,f):
     y=np.array(y)
     return X,y
 ######################################################################################################
-def KRR_function(hyperparams,X,y):
+def KRR_function_LOO(hyperparams,X,y):
     # Assign hyper-parameters
     alpha_value,gamma_value = hyperparams
-    # Split data into test and train: random state fixed for reproducibility
-    loo = LeaveOneOut()
+    # Initialize lists with final results
     y_pred_total = []
     y_test_total = []
+    # Split data into test and train: random state fixed for reproducibility
+    loo = LeaveOneOut()
     # kf-fold cross-validation loop
     for train_index, test_index in loo.split(X):
-        #print('NEW FOLD')
-        #print('train_index:', train_index)
-        #print('test_index:', test_index)
         X_train, X_test = X[train_index], X[test_index]
         y_train, y_test = y[train_index], y[test_index]
-        #print('y_test')
-        #print(sorted(y_test))
         # Scale X_train and X_test
         scaler = preprocessing.StandardScaler().fit(X_train)
         X_train_scaled = scaler.transform(X_train)
@@ -76,18 +72,10 @@ def KRR_function(hyperparams,X,y):
     # Flatten lists with test and predicted values
     y_pred_total = [item for sublist in y_pred_total for item in sublist]
     y_test_total = [item for sublist in y_test_total for item in sublist]
-    diff_list = [np.abs(a_i - b_i) for a_i, b_i in zip(y_pred_total, y_test_total)]
-    print('mean: %.4f' % np.mean(diff_list))
-    print('var: %.4f' % np.var(diff_list))
-    print('stdev: %.4f' % statistics.stdev(diff_list))
-    #print('y_test_total')
-    #print(y_test_total)
-    #print('y_pred_total')
-    #print(y_pred_total)
     # Calculate error metric of test and predicted values: rmse
     rmse = np.sqrt(mean_squared_error(y_test_total, y_pred_total))
     r_pearson,_=pearsonr(y_test_total,y_pred_total)
-    print('alpha: %.2f . gamma: %.2f . rmse: %.4f . r: %.4f' %(alpha_value,gamma_value,rmse,r_pearson)) # Uncomment to print intermediate results
+    print('KRR leave-one-out cross-validation . RMSE: %.4f . r: %.4f' %(rmse,r_pearson))
     plot_scatter(y_test_total,y_pred_total)
     return rmse
 ######################################################################################################

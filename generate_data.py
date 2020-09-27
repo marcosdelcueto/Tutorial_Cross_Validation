@@ -19,7 +19,7 @@ def generate_data(xmin,xmax,Delta,noise):
             f[i][j] = f[i][j] + random.uniform(-noise,noise)  # add random noise to f(x1,x2)
     return x1,x2,f
 
-# Create {x1,x2,f} dataset every 1.0 from -10 to 10, with a noise of +/- 2
+# Create {x1,x2,f} dataset every 1.0 from -10 to 10, with a noise of +/- 0.2
 x1,y1,f1=generate_data(-10,10,1.0,0.2)
 
 fig = plt.figure()
@@ -28,8 +28,6 @@ ax = fig.add_subplot(1, 2,2)
 ax.set(adjustable='box', aspect='equal')
 surface=ax.contourf(x1, y1, f1, cmap='viridis',zorder=0)
 cbar=plt.colorbar(surface)
-#points = ax.scatter(x1, y1, c=f1,cmap='viridis',s=60,zorder=1)
-#cbar=plt.colorbar(points)
 cbar.set_label("$f(x_1,x_2)$",fontsize=16)
 cbar.ax.tick_params(labelsize=14)
 ax.set_xlabel('$x_1$',fontsize=16)
@@ -41,7 +39,6 @@ ax.set_yticklabels(np.arange(-10,12.5,2.5),fontsize=14)
 # Left subplot
 ax1 = fig.add_subplot(1, 2, 1,projection='3d')
 ax1.plot_surface(x1, y1, f1, rstride=1, cstride=1,linewidth=0, antialiased=False,cmap='viridis',zorder=0)
-#ax1.scatter(x1, y1, f1,c=f1,cmap='viridis',s=60,zorder=1)
 ax1.set_xlabel('$x_1$',fontsize=16)
 ax1.set_xticks(np.arange(-10,12.5,2.5))
 ax1.set_xticklabels(np.arange(-10,12.5,2.5),fontsize=14)
@@ -57,5 +54,5 @@ ax.plot([-0.30, -0.30], [0.0, 1.0], transform=ax.transAxes, clip_on=False,color=
 plt.subplots_adjust(wspace = 0.5)
 fig = plt.gcf()
 fig.set_size_inches(21.683, 9.140)
-file_name = 'Figure1.png'
+file_name = 'Figure_data.png'
 plt.savefig(file_name,format='png',dpi=600,bbox_inches='tight')
